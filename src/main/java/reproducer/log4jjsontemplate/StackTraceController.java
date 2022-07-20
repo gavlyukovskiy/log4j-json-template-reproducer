@@ -9,6 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class StackTraceController {
     private static final Logger logger = LoggerFactory.getLogger(StackTraceController.class);
 
+    private final ServiceLayer serviceLayer;
+
+    public StackTraceController(ServiceLayer serviceLayer) {
+        this.serviceLayer = serviceLayer;
+    }
+
     @GetMapping
     public void test() {
         try {
@@ -16,6 +22,19 @@ public class StackTraceController {
                 throw new NullPointerException("original error");
             } catch (Exception e) {
                 throw new IllegalArgumentException("wrapper error", e);
+            }
+        } catch (Exception e) {
+            logger.error("error", e);
+        }
+    }
+
+    @GetMapping("/multi")
+    public void testMulti() {
+        try {
+            try {
+                serviceLayer.doSomething();
+            } catch (Exception e) {
+                throw new IllegalArgumentException("StackTraceController.exception", e);
             }
         } catch (Exception e) {
             logger.error("error", e);
